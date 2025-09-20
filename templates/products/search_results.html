@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="basket-container">
+    <h2>Search Results for "{{ query }}"</h2>
+
+    {% if products %}
+      <div class="basket-grid">
+        {% for product in products %}
+          <div class="card">
+            <div class="card-image-wrapper">
+              {% if product.image %}
+              <a href="{% url 'products:product_detail' product.id %}">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+              </a>
+              {% endif %}
+            </div>
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-desc">{{ product.description }}</p>
+            <p class="product-price">₹ {{ product.price }}</p>
+            <div class="action-row">
+              <button onclick="addToCart('{{ product.id }}')" class="add-btn">Add</button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No products found for your search.</p>
+    {% endif %}
+  </div>
+{% endblock %}

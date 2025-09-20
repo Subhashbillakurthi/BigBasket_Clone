@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+  <script src="{% static 'js/style.js' %}"></script>
+</head>
+<body>
+    
+<div class="order-success-container">
+  <h2>Your order is placed successfully</h2>
+  <div>
+    <b>Deliver to:</b> {{ order.address }}<br>
+    <b>Slot:</b> {{ order.delivery_slot }}<br>
+    <b>Total:</b> ₹{{ order.total_amount }} &nbsp; <b>Saved:</b> ₹{{ order.savings }}
+  </div>
+  <div style="margin:20px 0">
+    <h3>Order Summary</h3>
+    {% for item in order.items.all %}
+      <img src="{{ item.image_url }}" height="48" style="margin-right:7px;">
+      {{ item.product }} ×{{ item.quantity }}
+    {% endfor %}
+  </div>
+  <a href="{% url 'home' %}" class="order-continue-btn">Continue shopping</a>
+</div>
+</body>
+</html>
+
+
+    
+</body>
+</html>
+

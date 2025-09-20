@@ -1,0 +1,222 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #fafafa;
+    color: #343434;
+    margin: 0;
+}
+.category-page {
+    display: flex;
+    margin: 0;
+    margin-right: 200px;
+    padding: 0;
+}
+.filter-panel {
+    width: 260px;
+    background: #fff;
+    margin-top: 20px;
+    margin-left: 200px;
+    border-right: 1px solid #eee;
+    padding: 20px 15px;
+    box-shadow: 0 2px 18px 0 rgba(0,0,0,0.01);
+}
+.filter-panel h2 {
+    font-size: 19px;
+    margin-bottom: 15px;
+}
+.filter-category .cat-main {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.filter-category .cat-sub {
+    font-size: 16px;
+    margin: 3px 0 8px 12px;
+    color: #3c8f1a;
+    cursor: pointer;
+}
+.filter-category .cat-sub.active {
+    font-weight: 700;
+    border-left: 4px solid #92c721;
+    padding-left: 8px;
+    background: #f6fff2;
+}
+.filter-block {
+    margin: 18px 0 9px 0;
+}
+.filter-block h4 {
+    font-size: 15px;
+    margin-bottom: 5px;
+    color: #888;
+}
+.filter-block label {
+    font-size: 15px;
+    margin-left: 7px;
+}
+.product-section {
+    flex: 1;
+    padding: 18px 20px 0 26px;
+}
+.heading {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+}
+.category-title {
+    font-size: 23px;
+    font-weight: bold;
+}
+.category-count {
+    font-size: 17px;
+    color: #555;
+    margin-left: 7px;
+}
+.sort-block {
+    margin-left: auto;
+}
+.sort-block button {
+    background: #fff;
+    border: 1.3px solid #eee;
+    font-size: 16px;
+    padding: 4px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.product-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px 18px;
+}
+.product-card {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 2px 12px #3daa141a;
+    padding: 18px 13px 22px 13px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    transition: box-shadow .2s;
+}
+/* .product-card {
+  border: 30px solid white;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+} */
+
+.product-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 7px;
+    margin-bottom: 12px;
+    margin-top: 7px;
+    background: #f7f7f7;
+}
+
+/* .product-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+} */
+.product-card:hover {
+    box-shadow: 0 5px 18px #4cb72a22;
+}
+.card-badge {
+    background: #8bc34a;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    position: absolute;
+    left: 13px; top: 11px;
+    padding: 2.5px 10px;
+    border-radius: 5px;
+}
+
+.card-delivery {
+    position: absolute;
+    right: 15px; top: 11px;
+    font-size: 13px;
+    color: #9aaf3a;
+    background: #f5fbbc;
+    border-radius: 10px;
+    padding: 1.5px 11px;
+    font-weight: 600;
+}
+.card-brand {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+.card-details {
+    font-size: 14px;
+    color: #969696;
+    margin-bottom: 12px;
+}
+.card-pricing {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+.current-price {
+    color: #222;
+    font-weight: bold;
+}
+.old-price {
+    text-decoration: line-through;
+    font-size: 14px;
+    color: #888;
+    margin-left: 8px;
+}
+.card-add-btn {
+    margin-top: auto;
+    background: #fff;
+    border: 1.2px solid #e41e26;
+    color: #e41e26;
+    border-radius: 6px;
+    padding: 7px 0;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    width: 90%;
+    align-self: center;
+}
+.card-add-btn:hover {
+    background: #e41e26;
+    color: #fff;
+}
+
+.filter-block.discount-block {
+    background: #fafafa;
+    border-radius: 7px;
+    padding: 7px 11px 5px 12px;
+    margin-top: 18px;
+    margin-bottom: 13px;
+    box-shadow: 0 2px 9px rgba(136,160,7,0.02);
+}
+.discount-header {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.discount-options {
+    margin-top: 7px;
+    margin-left: 2px;
+    display: block;
+}
+
+.discount-options label {
+    font-size: 15px;
+    color: #363636;
+    cursor: pointer;
+}
+/* Show if a radio is selected, active class could be controlled with JS if needed */

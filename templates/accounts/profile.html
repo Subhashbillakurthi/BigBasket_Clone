@@ -1,0 +1,222 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Grocery Shopping and Online Supermarket in India - bigbasket</title>
+  <link rel="shortcut icon"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3XfekLrDCd5cGYZHG0XelJNQ-hUCq2Jj6Vg&s"
+    type="image/x-icon">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+
+<body>
+  <nav class="breadcrumb">
+    <a href="{% url 'home' %}"
+      style="text-decoration: none;color: rgb(84, 79, 79);margin-left: 200px;margin-top: 20px;">Home/</a>Profile
+  </nav>
+
+  <div class="profile-container">
+    <!-- Sidebar -->
+    <div class="account-sidebar">
+      <div class="sidebar-group">
+        <div class="sidebar-title">PERSONAL DETAILS</div>
+        <button class="profile-menu-btn active" data-tab="profile-details">Edit Profile</button>
+        <button class="profile-menu-btn" data-tab="email-addresses">Email Addresses</button>
+        <button class="profile-menu-btn" data-tab="delivery-addresses">Delivery Addresses</button>
+      </div>
+      <div class="sidebar-group">
+        <div class="sidebar-title">SHOP FROM</div>
+        <button class="profile-menu-btn" data-tab="smart-basket">Smart Basket</button>
+        <button class="profile-menu-btn" data-tab="past-orders">Past Orders</button>
+      </div>
+      <div class="sidebar-group">
+        <div class="sidebar-title">MY ACCOUNT</div>
+        <button class="profile-menu-btn" data-tab="orders">My Orders</button>
+        <button class="profile-menu-btn" data-tab="service">Customer Service</button>
+        <button class="profile-menu-btn" data-tab="wallet">My Wallet</button>
+        <button class="profile-menu-btn" data-tab="gift-cards">My Gift Cards</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="account-main-content">
+      <!-- Profile Details -->
+      <div id="profile-details" class="account-tab-content active">
+        <div class="profile-card">
+          <div id="profile-view">
+            <h2>Profile Details <span onclick="showEditProfile()" style="cursor:pointer; color:#1270ee;">(Edit)</span>
+            </h2>
+            <p><strong>Name:</strong> {{ request.user.get_full_name|default:request.user.username }}</p>
+            <p><strong>Email:</strong> {{ request.user.email }}</p>
+            <p><strong>Mobile Number:</strong> {{ profile.phone_number }}</p>
+          </div>
+
+          <div id="profile-edit" style="display:none;">
+            <h2>Edit Profile</h2>
+            <form method="POST" class="profile-edit-form" id="profile-edit-section">
+              {% csrf_token %}
+              <label for="id_name">Name:</label><br>
+              <input type="text" name="name" value="{{ user.get_full_name|default:user.username }}"><br><br>
+
+              <label for="id_email">Email:</label><br>
+              <input type="text" class="login-input" id="gmailInput" name="email" placeholder="{{ user.email }}" required>
+              <span id="emailError" style="color:red; font-size:13px; display:none;">
+                Please enter a valid Gmail address (example@gmail.com)
+              </span>
+
+              <label for="id_phone">Mobile Number:</label><br>
+              <input type="text" 
+                      name="phone_number" 
+                      value="{{ profile.phone_number }}" 
+                      maxlength="10" 
+                      pattern="\d{10}" 
+                      title="Please enter exactly 10 digits"
+                      oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
+                <br><br>
+
+              <button type="submit" class="profile-save-btn">Save</button>
+              <button type="button" onclick="hideEditProfile()">Cancel</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email Addresses -->
+      <div id="email-addresses" class="account-tab-content">
+        <h2>Email Addresses</h2>
+        <p>Your current email:</p>
+        <strong>{{ request.user.email }}</strong>
+      </div>
+
+      <!-- Delivery Addresses -->
+      <div id="delivery-addresses" class="account-tab-content">
+        <h2>Delivery Addresses</h2>
+        {% for address in addresses %}
+        <p>{{ address.address_line }}, {{ address.city }}
+          {% if address.is_default %}
+          <strong>(Default)</strong>
+          {% endif %}
+        </p>
+        {% endfor %}
+
+        <p class="add-address-btn" onclick="toggleEditAddress()" style="cursor:pointer; color:#1270ee;">
+          Add New Address +
+        </p>
+
+        <form method="POST" style="display:none;" class="address-edit-form profile-section" id="address-edit-section">
+          {% csrf_token %}
+          <label for="id_address_line">Address:</label><br>
+          <textarea name="address_line" rows="3" cols="40"></textarea><br><br>
+
+          <label for="id_city">City:</label><br>
+          <input type="text" name="city"><br><br>
+
+          <label for="id_is_default">Set as Default:</label>
+          <input type="checkbox" name="is_default"><br><br>
+
+          <button type="submit" class="profile-save-btn">Save Address</button>
+          <button type="button" onclick="hideEditAddress()">Cancel</button>
+        </form>
+      </div>
+
+      <!-- Other Tabs -->
+      <div id="smart-basket" class="account-tab-content">
+        <h2>Smart Basket</h2>
+        <p>Show smart basket info here</p>
+      </div>
+
+      <div id="past-orders" class="account-tab-content">
+        <h2>Past Orders</h2>
+      </div>
+
+      <div id="orders" class="account-tab-content">
+        {% include "orders/orders_list.html" with orders=orders %}
+      </div>
+
+      <div id="service" class="account-tab-content">
+        <h2>Customer Service</h2>
+        <p>Contact/help links here</p>
+      </div>
+
+      <div id="wallet" class="account-tab-content">
+        <h2>My Wallet</h2>
+        <p>Show wallet summary here</p>
+      </div>
+
+      <div id="gift-cards" class="account-tab-content">
+        <h2>My Gift Cards</h2>
+        <p>Your gift cards info here</p>
+      </div>
+    </div>
+  </div>
+
+  {% block content %}
+  {% endblock %}
+</body>
+
+<script>
+  // Profile edit toggle
+  function showEditProfile() {
+    document.getElementById("profile-view").style.display = "none";
+    document.getElementById("profile-edit").style.display = "block";
+  }
+  function hideEditProfile() {
+    document.getElementById("profile-edit").style.display = "none";
+    document.getElementById("profile-view").style.display = "block";
+  }
+
+  // Address form toggle
+  function toggleEditAddress() {
+    const form = document.getElementById("address-edit-section");
+    form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+  }
+  function hideEditAddress() {
+    document.getElementById("address-edit-section").style.display = "none";
+  }
+
+
+// address validation
+const gmailInput = document.getElementById("gmailInput");
+  const emailError = document.getElementById("emailError");
+
+  // Relaxed regex: must start with a letter OR number, only letters/numbers/._- allowed, must end with @gmail.com
+  const gmailRegex = /^[a-zA-Z0-9][a-zA-Z0-9._-]*@gmail\.com$/;
+
+  gmailInput.addEventListener("input", function () {
+    const value = gmailInput.value.trim();
+
+    if (value === "") {
+      // If empty, reset state
+      emailError.style.display = "none";
+      gmailInput.style.borderColor = "";
+    } else if (gmailRegex.test(value)) {
+      // Valid Gmail
+      emailError.style.display = "none";
+      gmailInput.style.borderColor = "green";
+    } else {
+      // Invalid Gmail
+      emailError.style.display = "block";
+      gmailInput.style.borderColor = "red";
+    }
+  });
+
+  // Prevent form submission if invalid
+  document.querySelector("form").addEventListener("submit", function (e) {
+    if (!gmailRegex.test(gmailInput.value.trim())) {
+      e.preventDefault();
+      emailError.style.display = "block";
+      gmailInput.style.borderColor = "red";
+    }
+  });
+</script>
+
+</html>

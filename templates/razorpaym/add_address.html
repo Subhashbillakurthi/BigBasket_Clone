@@ -1,0 +1,247 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Geocoder (Search plugin) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  <style>
+    body { background-color: #f9f9f9; }
+    .checkout-header {
+      background: #476F00; color: white; padding: 15px;
+    }
+    .order-summary {
+      border: 1px solid #ddd; border-radius: 8px;
+      padding: 20px; background: white;
+    }
+    .savings {
+      background: #e8f8e5; color: #476F00;
+      font-weight: bold; padding: 10px;
+      border-radius: 6px;
+    }
+    #map {
+      height: 350px; margin-bottom: 20px;
+      border-radius: 8px; border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="checkout-header d-flex justify-content-between align-items-center fixed-top" style="padding:30px 220px;">
+  <div class="logo" style="padding-right: 30px;">
+    <a href="{% url 'home' %}">
+    <img src="/static/images/fevi.png" alt="" style="border-radius: 10px;height: 50px;">
+    </a>
+  </div>
+</div>
+<div style="margin-top: 150px;"></div>
+
+<!-- Main Layout -->
+<div class="container my-4" style="padding: 8px 90px;">
+  <div class="row">
+    <!-- Left: Address Selection -->
+    <div class="col-md-8">
+      <h5 class="mb-3" style="font-weight: bolder; font-size: 24px;">Select your address</h5>
+        
+      <!-- ✅ Map added -->
+      <div id="map"></div>
+        <span id="pincodeError" style="color:red; font-size:13px; display:none;">
+              Pincode not available
+            </span>
+      <form method="post" onsubmit="return validateAddressFields();">
+        {% csrf_token %}
+        
+        <!-- Area Details -->
+        <h5>Area Details</h5>
+        <div class="row form-section">
+          <div class="col-md-6">
+            <label class="form-label">Address Line.</label>
+            <input type="text" id="addressInput" name="address_line" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">State</label>
+            <input type="text" id="stateInput" name="state" class="form-control">
+          </div>
+        </div>
+
+        <div class="row form-section">
+          <div class="col-md-6">
+            <label class="form-label">City</label>
+            <input type="text" id="cityInput" name="city" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">PinCode</label>
+            <input type="text" id="pincodeInput" name="pincode" class="form-control" maxlength="6" required>
+            <span id="pincodeError" style="color:red; font-size:13px; display:none;">
+              Pincode not available
+            </span>
+          </div>
+        </div>
+
+        <!-- Personal Details -->
+        <h5>Personal Details</h5>
+        <div class="row form-section">
+          <div class="col-md-4">
+            <label class="form-label">Name</label>
+            <input type="text" name="customer_name" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Email</label>
+            <input type="text" name="customer_email" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Mobile Number</label>
+            <input type="text" name="customer_phone" class="form-control" required>
+          </div>
+        </div>
+
+        <!-- Address Type -->
+        <h5>Address Type</h5>
+        <div class="form-section address-type">
+          <input type="radio" name="address_type" value="home" class="btn-check" id="home">
+          <label class="btn btn-outline-secondary" for="home"><i class="fa-solid fa-house"></i> Home</label>
+
+          <input type="radio" name="address_type" value="office" class="btn-check" id="office">
+          <label class="btn btn-outline-secondary" for="office"><i class="fa-solid fa-building"></i> Office</label>
+
+          <input type="radio" name="address_type" value="other" class="btn-check" id="other">
+          <label class="btn btn-outline-secondary" for="other"><i class="fa-solid fa-location-dot"></i> Other</label>
+        </div>
+
+        <!-- Default Address -->
+        <div class="form-check form-section">
+          <input class="form-check-input" type="checkbox" name="is_default" id="default">
+          <label class="form-check-label" for="default">Set this as default</label>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-danger">Add address</button>
+      </form>
+    </div>
+
+    <!-- Right: Order Summary -->
+    <div class="col-md-4">
+      <div class="order-summary" style="border-top: 7px solid #476F00;">
+        <h5>Order Summary</h5>
+        <hr> 
+        <div class="d-flex justify-content-between mb-2">
+          <p class="mb-0">Basket Value</p>
+          <p class="mb-0">₹{{ total_amount }}</p>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <p class="mb-0">Delivery & Handling Charges:</p>
+          <p class="mb-0"><span style="text-decoration: line-through; color: #747272;">₹49</span> ₹0</p>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <p class="mb-0"><strong>Total Amount Payable:</strong></p>
+          <p class="mb-0"><strong>₹{{ total_amount }}</strong></p>
+        </div>
+        <div class="d-flex justify-content-between mb-2 savings">
+          <p class="mb-0">You Saved:</p>
+          <p class="mb-0"><strong>₹{{ savings }}</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JS for Map -->
+<script>
+  var map = L.map("map").setView([12.9716, 77.5946], 12);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  var bangaloreBounds = L.latLngBounds([12.8, 77.4],[13.1, 77.8]);
+  var marker;
+
+  // ✅ Validation function
+  function validateAddressFields() {
+    let city = document.getElementById("cityInput").value.trim().toLowerCase();
+    let pincode = document.getElementById("pincodeInput").value.trim();
+    let pincodeError = document.getElementById("pincodeError");
+
+    let validCity = (city === "bangalore" || city === "bengaluru");
+    let validPincode = (/^\d{6}$/.test(pincode) && parseInt(pincode) >= 560001 && parseInt(pincode) <= 560085);
+
+    if (!validCity) {
+      pincodeError.style.display = "block";
+      pincodeError.innerText = "❌ Sorry, we deliver only in Bangalore / Bengaluru.";
+      return false;
+    }
+
+    if (!validPincode) {
+      pincodeError.style.display = "block";
+      pincodeError.innerText = "❌ Pincode not deliverable (only 560001 - 560085 allowed).";
+      return false;
+    }
+
+    pincodeError.style.display = "none";
+    return true;
+  }
+
+  // Attach validation on blur
+  document.getElementById("cityInput").addEventListener("blur", validateAddressFields);
+  document.getElementById("pincodeInput").addEventListener("blur", validateAddressFields);
+
+  // Add Search Control
+  L.Control.geocoder({ defaultMarkGeocode: false })
+    .on("markgeocode", function(e) {
+      var latlng = e.geocode.center;
+      if (bangaloreBounds.contains(latlng)) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(latlng).addTo(map);
+        map.setView(latlng, 15);
+
+        document.getElementById("addressInput").value = e.geocode.name;
+        document.getElementById("cityInput").value = "Bangalore";
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json`)
+          .then(r => r.json())
+          .then(data => {
+            document.getElementById("pincodeInput").value = data.address?.postcode || "";
+            document.getElementById("stateInput").value = data.address?.state || "";
+            validateAddressFields();
+          });
+      } else {
+        document.getElementById("pincodeError").style.display = "block";
+        document.getElementById("pincodeError").innerText = "❌ Sorry, we can’t deliver to this location!";
+      }
+    })
+    .addTo(map);
+
+  // Allow clicking map
+  map.on("click", function(e) {
+    if (bangaloreBounds.contains(e.latlng)) {
+      if (marker) map.removeLayer(marker);
+      marker = L.marker(e.latlng).addTo(map);
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${e.latlng.lat}&lon=${e.latlng.lng}&format=json`)
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById("addressInput").value = data.display_name || "";
+          document.getElementById("cityInput").value = data.address?.city || "Bangalore";
+          document.getElementById("pincodeInput").value = data.address?.postcode || "";
+          document.getElementById("stateInput").value = data.address?.state || "";
+          validateAddressFields();
+        });
+    } else {
+      document.getElementById("pincodeError").style.display = "block";
+      document.getElementById("pincodeError").innerText = "❌ Sorry, we can’t deliver to this location!";
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+  <script src="{% static 'js/style.js' %}"></script>
+</head>
+<body>
+    
+<div class="checkout-progress-bar">
+  <div class="step complete">✔ Delivery Address</div>
+  <div class="summary-value">
+    {% for addr in addresses %}
+        <b>{{ addr.address_line }}</b>
+        <br>{{ addr.city }}
+    {% endfor %}
+  </div>
+  <button id="changeAddressBtn" class="summary-change-btn">Change</button>
+<!--  -->
+  <div id="addressSelectionBox" style="display: none;">
+    <h2>Select your address</h2>
+    <form method="POST">{% csrf_token %}
+      <div class="addresses-grid">
+        <button type="button" class="address-card add-new" onclick="showAddAddressForm()">+ Add New Address</button>
+        {% for addr in addresses %}
+        <label class="address-card {% if selected_address.id == addr.id %}active{% endif %}">
+            <input type="radio" name="select_address" value="{{ addr.id }}" {% if selected_address.id == addr.id %}checked{% endif %} style="display:none;">
+            <div>
+                <b>{{ addr.label }}</b>
+                <div>{{ addr.line1 }}</div>
+                <div>{{ addr.city }}, {{ addr.pincode }}</div>
+                <div>Ph: {{ addr.phone_number }}</div>
+            </div>
+            {% if addr.is_default %}<span class="badge">DEFAULT</span>{% endif %}
+        </label>
+        {% endfor %}
+      </div>
+      <button type="submit" class="primary-btn">Select Address</button>
+    </form>
+    <form method="POST" id="addAddressForm" style="display: none;">{% csrf_token %}
+        <input type="hidden" name="add_address" value="1">
+        <input name="label" placeholder="Label (e.g. Home)" required>
+        <input name="line1" placeholder="Full address" required>
+        <input name="city" placeholder="City" required>
+        <input name="pincode" placeholder="Pin code" required>
+        <input name="phone_number" placeholder="Phone" required>
+        <button type="submit">Save Address</button>
+    </form>
+</div>
+<!--  -->
+  <div class="step active">Delivery Options</div>
+  <div class="step">Payment Options</div>
+</div>
+<div class="checkout-body">
+  <form method="POST">{% csrf_token %}
+    <div class="checkout-content">
+      <h3>Select a delivery option</h3>
+      <div class="checkout-cart-preview">
+        {% for item in cart_items %}
+          <img src="{{ item.product.image }}" height="54" style="margin-right:9px;">
+        {% endfor %}
+        <button type="button" class="view-products-btn">View {{ cart_items|length }} Items</button>
+      </div>
+      <label>Delivery Slot</label>
+      <select name="delivery_slot" required>
+        {% for slot in slots %}
+          <option value="{{ slot.date }}|{{ slot.slot_label }}">{{ slot.display }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Proceed To Pay</button>
+    </div>
+  </form>
+  <div class="order-summary-box">
+    <h4>Order Summary</h4>
+    <div class="summary-row">
+      <span>Total Amount Payable</span>
+      <span>₹{{ total }}</span>
+    </div>
+    <div class="summary-row savings">
+      <span>Total Savings</span>
+      <span>₹{{ savings }}</span>
+    </div>
+    <div class="delivery-tip">
+      <span>ℹ</span> Select your address and delivery slot to know accurate delivery charges.<br>
+      You can save more by applying a voucher!
+    </div>
+  </div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Custom Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #11d1e6;
+      min-height: 100vh;
+      color: rgb(12, 12, 12);
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 10px;
+      color: white;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      background: #495057;
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: 20px;
+    }
+
+    .table th,
+    .table td {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h4 class="p-3" style="font-weight: 800;color: black;">Custom Admin</h4>
+      <a href="#users">Users</a>
+      <a href="#addresses">Addresses</a>
+      <a href="#categories">Categories</a>
+      <a href="#products">Products</a>
+      <a href="#orders">Orders</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <h2>Dashboard</h2>
+      <p>Welcome, {{ request.user.username }}</p>
+
+      <!-- Users -->
+      <div id="users" class="mb-5">
+        <h3>Users</h3>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Staff</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.id }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.is_staff }}</td>
+              <td>
+                <a href="{% url 'delete_user' user.id %}" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">No users found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="{% url 'add_user' %}" class="btn btn-primary">+ Add User</a>
+      </div>
+
+      <!-- Addresses -->
+      <div id="addresses" class="mb-5">
+        <h3>Addresses</h3>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>City</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            {% for addr in addresses %}
+            <tr>
+              <td>{{ addr.id }}</td>
+              <td>{{ addr.user.username }}</td>
+              <td>{{ addr.city }}</td>
+            
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">No addresses found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Categories -->
+      <div id="categories" class="mb-5">
+        <h3>Categories</h3>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            <tr>
+              <td>{{ cat.id }}</td>
+              <td>{{ cat.name }}</td>
+              <td>
+                <a href="{% url 'edit_category' cat.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'delete_category' cat.id %}" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3">No categories found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="{% url 'add_category' %}" class="btn btn-primary">+ Add Category</a>
+      </div>
+
+      <!-- Products -->
+      <div id="products" class="mb-5">
+        <h3>Products</h3>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Actions</th>
+              <th>Vendor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+            <tr>
+              <td>{{ product.id }}</td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.price }}</td>
+              <td>
+                <a href="{% url 'edit_product' product.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'delete_product' product.id %}" class="btn btn-sm btn-danger">Delete</a>
+              </td>
+              <td>{{ product.vendor }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">No products found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="{% url 'add_product' %}" class="btn btn-primary">+ Add Product</a>
+      </div>
+
+      <!-- Orders -->
+      <div id="orders" class="mb-5">
+        <h3>Orders</h3>
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr>
+              <td>{{ order.id }}</td>
+              <td>{{ order.user.username }}</td>
+              <td>{{ order.status }}</td>
+              <td>
+                <a href="{% url 'view_order' order.id %}" class="btn btn-info btn-sm">View</a>
+                <a href="{% url 'update_order_status' order.id %}" class="btn btn-sm btn-warning">Oders Status</a>
+                <!-- <a href="#" class="btn btn-sm btn-danger">Delete</a> -->
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">No orders found</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+</html>

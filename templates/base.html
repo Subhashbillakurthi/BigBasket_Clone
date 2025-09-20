@@ -1,0 +1,450 @@
+{% include 'navbar.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Grocery Shopping and Online Supermarket in India - bigbasket</title>
+  <link rel="shortcut icon"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3XfekLrDCd5cGYZHG0XelJNQ-hUCq2Jj6Vg&s"
+    type="image/x-icon">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="{% static 'js/style.js' %}"></script>
+
+
+</head>
+
+<body>
+  <!-- banner promo-->
+  <div class="promo-bar">
+    <a href="{% url 'products:category_products' category_id=17 %}">
+      <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_topstrip_m_250923_01.png?tr=w-190,q-80" alt="">
+    </a>
+    <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_topstrip_m_250923_02.png?tr=w-190,q-80" alt="">
+    <a href="{% url 'products:category_products' category_name='Ayurveda' %}">
+      <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_topstrip_m_250923_03.png?tr=w-190,q-80" alt="">
+    </a>
+    <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_topstrip_m_250923_04.png?tr=w-190,q-80" alt="">
+    <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_topstrip_m_250923_05.png?tr=w-190,q-80" alt="">
+    <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_topstrip_m_250923_06.png?tr=w-190,q-80" alt="">
+  </div>
+
+  <!-- Product Grid -->
+  <div class="basket-container">
+   <div class="d-flex justify-content-between align-items-center">
+      <p class="basket-title mb-0">My Smart Basket</p>
+    </div>
+
+
+    <div class="basket-wrapper">
+      <button class="scroll-btn left" onclick="scrollBasket(-1)">
+        &#8249; <!-- Left arrow -->
+      </button>
+
+      <div class="basket-scroll" id="basketScroll">
+        {% for product in products %}
+        <div class="card">
+          <div class="card-image-wrapper">
+            <div class="offer-label">20% OFF</div>
+            
+            {% if product.quantity is 0 %}
+              
+              {% if product.image %}
+              <a href="{% url 'products:product_detail' product.id %}">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+              </a>
+              <div class="out-of-stock-overlay">Out Of Stock</div>
+              {% endif %}
+            {% else %}
+              {% if product.image %}
+              <a href="{% url 'products:product_detail' product.id %}">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+              </a>
+              {% endif %}
+            {% endif %}
+            
+            
+          </div>
+
+          <div class="time-label">5 MINS</div>
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-desc">{{ product.description }}</p>
+          <p class="product-price">₹ {{ product.price }}</p>
+
+          <div class="action-row">
+            <button class="bookmark-btn" title="Add to Wishlist" data-product-id="{{ product.id }}">
+            <span class="material-icons" style="font-size: 18px">bookmark_outline</span>
+            </button>
+            {% if product.quantity %}
+            <button class="add-btn" data-url="{% url 'cart:add_to_cart_ajax' product.id %}" data-product-id="{{ product.id }}">Add to Cart</button>
+            {% else %}
+            <button class="add-btn3" data-product-id="{{ product.id }}">Out of Stock</button>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button class="scroll-btn right" onclick="scrollBasket(1)">
+        &#8250; <!-- Right arrow -->
+      </button>
+    </div>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="basket-container best-sellers">
+    <p class="basket-title ">Best Sellers</p>
+
+    <div class="basket-wrapper">
+      <button class="scroll-btn left" onclick="scrollBasket(-1)">
+        &#8249; <!-- Left arrow -->
+      </button>
+
+      <div class="basket-scroll" id="basketScroll">
+        {% for product in products1 %}
+        <div class="card">
+          <div class="card-image-wrapper">
+            <div class="offer-label">20% OFF</div>
+            {% if product.quantity is 0 %}
+              
+              {% if product.image %}
+              <a href="{% url 'products:product_detail' product.id %}">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+              </a>
+              <div class="out-of-stock-overlay">Out Of Stock</div>
+              {% endif %}
+            {% else %}
+              {% if product.image %}
+              <a href="{% url 'products:product_detail' product.id %}">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+              </a>
+              {% endif %}
+            {% endif %}
+          </div>
+
+          <div class="time-label">5 MINS</div>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-desc">{{ product.description }}</p>
+          <p class="product-price">₹ {{ product.price }}</p>
+
+          <div class="action-row">
+            <button class="bookmark-btn" title="Add to Wishlist" data-product-id="{{ product.id }}">
+            <span class="material-icons" style="font-size: 18px">bookmark_outline</span>
+            </button>
+            <button class="add-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button class="scroll-btn right" onclick="scrollBasket(1)">
+        &#8250; <!-- Right arrow -->
+      </button>
+    </div>
+  </div>
+
+
+  <!-- banner promo -1-->
+  <h4 class="section-title">Top Offers</h2>
+    <div class="offer-bar">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/2b94a9cf-895f-460d-849a-1eee860c974c/hp_dow-topoffersStorefront_m_480_250723_01.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/2b94a9cf-895f-460d-849a-1eee860c974c/hp_big-packs-topoffersStorefront_m_480_250723_02.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/2b94a9cf-895f-460d-849a-1eee860c974c/hp_combos-topoffersStorefront_m_480_250723_03.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/2b94a9cf-895f-460d-849a-1eee860c974c/hp_30-corner-topoffersStorefront_m_480_250723_04.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -2-->
+    <h4 class="section-title">Fruits and Vegetables</h4>
+    <div class="offer-bar">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/41a0810e-1fc3-46e4-9d2c-7d9e79e0aa29/hp_f&v_m_fresh-vegetables_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/41a0810e-1fc3-46e4-9d2c-7d9e79e0aa29/hp_f&v_m_fresh-fruits_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/41a0810e-1fc3-46e4-9d2c-7d9e79e0aa29/hp_f&v_m_cuts-&-exotics_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/41a0810e-1fc3-46e4-9d2c-7d9e79e0aa29/hp_f&v_m_herbs-&-seasoning_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -3-->
+    <h4 class="section-title">Your Daily Staples</h4>
+    <div class="offer-bar-3">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/0bb0a6da-8713-48fc-a40d-93cd63ca2025/hp_atta-flour-staplesStorefront_m_480_250323_01.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/0bb0a6da-8713-48fc-a40d-93cd63ca2025/hp_rice-staplesStorefront_m_480_250323_02.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/0bb0a6da-8713-48fc-a40d-93cd63ca2025/hp_dals-pulses-staplesStorefront_m_480_250323_03.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/0bb0a6da-8713-48fc-a40d-93cd63ca2025/hp_cooking-oils-staplesStorefront_m_480_250323_04.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/0bb0a6da-8713-48fc-a40d-93cd63ca2025/hp_dry-fruits-staplesStorefront_m_480_250323_05.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/0bb0a6da-8713-48fc-a40d-93cd63ca2025/hp_salt-staplesStorefront_m_480_250323_06.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -4-->
+    <h4 class="section-title">Beverages</h4>
+    <div class="offer-bar-3">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/e4a9856b-dc3f-4927-a5a1-8edfe8d7dc38/hp_bev_m_health-drinks-&-supplements_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/e4a9856b-dc3f-4927-a5a1-8edfe8d7dc38/hp_bev_m_tea-&-coffee_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/e4a9856b-dc3f-4927-a5a1-8edfe8d7dc38/hp_bev_m_flavoured-&-soya-milk_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/e4a9856b-dc3f-4927-a5a1-8edfe8d7dc38/hp_bev_m_juices_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/e4a9856b-dc3f-4927-a5a1-8edfe8d7dc38/hp_bev_m_energy-drinks_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/e4a9856b-dc3f-4927-a5a1-8edfe8d7dc38/hp_bev_m_soft-drinks-&-more_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -5-->
+    <h4 class="section-title">Snacks Store</h4>
+    <div class="offer-bar">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/09ece9f7-7ac9-4d1e-afbb-f8ac572add38/hp_sbf_m_biscuits-&-namkeens_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/09ece9f7-7ac9-4d1e-afbb-f8ac572add38/hp_sbf_m_breakfast-cereals_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/09ece9f7-7ac9-4d1e-afbb-f8ac572add38/hp_sbf_m_pasta-sauces-&-more_480_270723.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/09ece9f7-7ac9-4d1e-afbb-f8ac572add38/hp_sbf_m_sweet-cravings_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -6-->
+    <h4 class="section-title">Cleaning & Household</h4>
+    <div class="offer-bar">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/fefafda6-5ef7-4ed2-8fee-2574720666d7/hp_c&h_m_cleaners_480_250723.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/fefafda6-5ef7-4ed2-8fee-2574720666d7/hp_c&h_m_detergents-&-fabric-care_480_250723.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/fefafda6-5ef7-4ed2-8fee-2574720666d7/hp_c&h_m_paper-disposables-&-garbage-bags_480_250723.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/fefafda6-5ef7-4ed2-8fee-2574720666d7/hp_c&h_m_freshner_480_250723.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -7-->
+    <h4 class="section-title">Beauty and Hygiene</h4>
+    <div class="offer-bar-3">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/50aa5fc7-cfa4-4919-b3ba-064fd9aa9441/hp_b&h_m_-makeup_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/50aa5fc7-cfa4-4919-b3ba-064fd9aa9441/hp_b&h_m_moisturiser_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/50aa5fc7-cfa4-4919-b3ba-064fd9aa9441/hp_b&h_m_perfumes_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/50aa5fc7-cfa4-4919-b3ba-064fd9aa9441/hp_b&h_m_mens-shaving_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/50aa5fc7-cfa4-4919-b3ba-064fd9aa9441/hp_b&h_m_minimum-30-off_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/50aa5fc7-cfa4-4919-b3ba-064fd9aa9441/hp_b&h_m_big-pack-bigger-saving%20bf_480_250923.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <!-- banner promo -8-->
+    <h4 class="section-title">Home and Kitchen</h4>
+    <div class="offer-bar-3">
+
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/1efc132e-4754-4359-a9a3-a9c3ec267d28/hp_GMunder-99_m_250723_01.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/1efc132e-4754-4359-a9a3-a9c3ec267d28/hp_GM100-199_m_250723_02.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/1efc132e-4754-4359-a9a3-a9c3ec267d28/hp_GMStorefront-pressure-cooker_m_250723_03.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/1efc132e-4754-4359-a9a3-a9c3ec267d28/hp_GMStorefront-stationery-store_m_250723_04.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/1efc132e-4754-4359-a9a3-a9c3ec267d28/hp_GM-storage-container_m_250723_05.jpg?tr=w-480,q-80"
+        alt="">
+      <img
+        src="https://www.bigbasket.com/media/customPage/b01eee88-e6bc-410e-993c-dedd012cf04b/91e53046-98e0-4c5b-ae53-7d073e5210e1/1efc132e-4754-4359-a9a3-a9c3ec267d28/hp_GM-cleaning-needs_m_250723_06.jpg?tr=w-480,q-80"
+        alt="">
+    </div>
+
+    <div class="slider-container">
+      <div class="slides">
+        <div class="slide active">
+          <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_m_petstore_250923_400.jpg?tr=w-1130,q-80"
+            alt="Slide 1">
+        </div>
+        <div class="slide">
+          <img
+            src="https://www.bigbasket.com/media/uploads/banner_images/hp_m_health_suppliment_250923_400.jpg?tr=w-1130,q-80"
+            alt="Slide 2">
+        </div>
+        <div class="slide">
+          <img src="https://www.bigbasket.com/media/uploads/banner_images/hp_m_babycare_250923_400.jpg?tr=w-1130,q-80"
+            alt="Slide 3">
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <button class="prev">&#10094;</button>
+      <button class="next">&#10095;</button>
+
+      <!-- Dots -->
+      <div class="dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+      </div>
+    </div>
+
+    <div class="about-section">
+      <h2 class="about-title">bigbasket – online grocery store</h2>
+      <p>
+        Did you ever imagine that the freshest of fruits and vegetables, top-quality pulses and food grains, dairy
+        products, and hundreds of branded items could be handpicked and delivered to your home, all at the click of a
+        button? In today's fast-paced world, bigbasket.com, India's pioneering online grocery store, continues to bring
+        a staggering array of over 40,000 products from more than 1,000 brands to the doorsteps of over 10 million
+        satisfied customers. From essential household cleaning products to the latest beauty and makeup trends,
+        bigbasket remains your one-stop shop for daily needs.
+      </p>
+      <p>
+        In these times, we've eliminated the stress associated with shopping for daily essentials. You can now
+        effortlessly order all your household products and groceries online. Plus, the added convenience of finding all
+        your requirements at a single source, coupled with substantial savings, demonstrates that bigbasket, India's
+        largest online supermarket, has transformed the way we shop for groceries. Online grocery shopping has become
+        second nature. And when it comes to freshness, whether it's fruits and vegetables or dairy and meat, we've got
+        you covered! Easily obtain fresh eggs, meat, fish, and more with just a few clicks.
+      </p>
+      <p>
+        We now serve 300+ cities and towns across India and ensure swift delivery times, guaranteeing that all your
+        groceries, snacks and branded foods reach you on time.
+      </p>
+      <p>
+        Slotted Delivery: Choose the most convenient delivery slot to receive your groceries, ranging from early morning
+        delivery for early birds to late-night delivery for those on the night shift. bigbasket caters to every
+        schedule.
+      </p>
+      <p>
+        Instant delivery from bbnow: In response to the ever-increasing demand for convenience, bbnow by bigbasket
+        offers lightning-fast grocery delivery, ensuring that your essentials are at your doorstep within 15-30 minutes.
+        Our quick delivery service has revolutionized the way you shop for groceries. Choose from 5000+ grocery
+        essentials. bbnow is available only in select cities.
+      </p>
+      <p>
+        Whether it's a last-minute dinner party or you simply need something urgently, we've got you covered. This
+        service exemplifies our commitment to providing you with not just the widest range of products but also the
+        fastest and most efficient shopping experience, making bigbasket.com the go-to destination for all your
+        immediate grocery needs.
+      </p>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+<script>
+  // Show/hide mega-menu on button click
+document.getElementById('openMegaMenu').addEventListener('click', function(e) {
+  document.getElementById('megaMenuDropdown').classList.toggle('active');
+});
+
+// Set up hover for categories and subcategories
+const mainCats = document.querySelectorAll('.main-cat');
+const subMenus = document.querySelectorAll('.level-two');
+const subCats = document.querySelectorAll('.sub-cat');
+const subSubMenus = document.querySelectorAll('.level-three');
+
+mainCats.forEach(cat => {
+  cat.addEventListener('mouseenter', function() {
+    // Remove .active from all main and sub menus
+    mainCats.forEach(c => c.classList.remove('active'));
+    subMenus.forEach(s => s.classList.remove('active'));
+    subSubMenus.forEach(s => s.classList.remove('active'));
+    // Activate hovered main cat
+    cat.classList.add('active');
+    const submenu = document.getElementById('sub-' + cat.dataset.sub);
+    if (submenu) submenu.classList.add('active');
+  });
+});
+
+subCats.forEach(subcat => {
+  subcat.addEventListener('mouseenter', function(e) {
+    // Remove .active from all sub-sub-menus
+    subSubMenus.forEach(s => s.classList.remove('active'));
+    subCats.forEach(s => s.classList.remove('active'));
+    // Activate hovered sub-cat
+    subcat.classList.add('active');
+    const subsubmenu = document.getElementById('subsub-' + subcat.dataset.subsub);
+    if (subsubmenu) subsubmenu.classList.add('active');
+    e.stopPropagation();
+  });
+});
+
+document.addEventListener('click', function(e) {
+  // Hide menu if click outside
+  if (!document.querySelector('.mega-menu-container').contains(e.target)) {
+    document.getElementById('megaMenuDropdown').classList.remove('active');
+    subMenus.forEach(s => s.classList.remove('active'));
+    mainCats.forEach(c => c.classList.remove('active'));
+    subSubMenus.forEach(s => s.classList.remove('active'));
+    subCats.forEach(s => s.classList.remove('active'));
+  }
+});
+
+</script>
+</body>
+
+
+
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+  <script src="{% static 'js/style.js' %}"></script>
+</head>
+<body>
+   
+ <div class="checkout-progress-bar">
+  <!-- Step 1: Address -->
+  <div class="step complete">✔ Delivery Address</div>
+  <div class="summary-value">
+    {% if selected_address %}
+        <b>{{ selected_address.label }}</b><br>
+        {{ selected_address.line1 }}, {{ selected_address.city }} - {{ selected_address.pincode }}
+    {% else %}
+        <b>No address selected</b>
+    {% endif %}
+  </div>
+  <button id="changeAddressBtn" class="summary-change-btn">Change</button>
+
+  <!-- Address Selection -->
+  <div id="addressSelectionBox" style="display: none;">
+    <h2>Select your address</h2>
+    <form method="POST">{% csrf_token %}
+      <input type="hidden" name="action" value="select_address">
+      <div class="addresses-grid">
+        <button type="button" class="address-card add-new" onclick="showAddAddressForm()">+ Add New Address</button>
+        {% for addr in addresses %}
+        <label class="address-card {% if selected_address and selected_address.id == addr.id %}active{% endif %}">
+          <input type="radio" name="select_address" value="{{ addr.id }}" 
+                 {% if selected_address and selected_address.id == addr.id %}checked{% endif %} style="display:none;">
+          <div>
+            <b>{{ addr.label }}</b>
+            <div>{{ addr.line1 }}</div>
+            <div>{{ addr.city }}, {{ addr.pincode }}</div>
+            <div>Ph: {{ addr.phone_number }}</div>
+          </div>
+          {% if addr.is_default %}<span class="badge">DEFAULT</span>{% endif %}
+        </label>
+        {% endfor %}
+      </div>
+      <button type="submit" class="primary-btn">Select Address</button>
+    </form>
+
+    <!-- Add New Address -->
+    <form method="POST" id="addAddressForm" style="display: none;">{% csrf_token %}
+      <input type="hidden" name="action" value="add_address">
+      <input name="label" placeholder="Label (e.g. Home)" required>
+      <input name="line1" placeholder="Full address" required>
+      <input name="city" placeholder="City" required>
+      <input name="pincode" placeholder="Pin code" required>
+      <input name="phone_number" placeholder="Phone" required>
+      <button type="submit">Save Address</button>
+    </form>
+  </div>
+
+  <!-- Step 2: Delivery Slot -->
+  <div class="step active">Delivery Options</div>
+  <div id="deliverySlotBox" class="delivery-slot-box">
+    <form method="POST">{% csrf_token %}
+      <input type="hidden" name="action" value="select_slot">
+      <h3>Select Delivery Slot</h3>
+      <div class="slots-grid">
+        {% for slot in slots %}
+        <label class="slot-card {% if selected_slot and selected_slot.id == slot.id %}active{% endif %}">
+          <input type="radio" name="delivery_slot" value="{{ slot.id }}" 
+                 {% if selected_slot and selected_slot.id == slot.id %}checked{% endif %} style="display:none;">
+          {{ slot.date }} - {{ slot.slot_label }}
+        </label>
+        {% endfor %}
+      </div>
+      <button type="submit" class="primary-btn">Confirm Slot</button>
+    </form>
+  </div>
+
+  <!-- Step 3: Payment -->
+  <div class="step">Payment Options</div>
+</div>
+
+
+
+
+
+</body>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_RGMzbdQct9fcmZ", // Enter the Key ID generated from the Dashboard
+    "amount": "{{payment.amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "ecomm",
+    "description": "Purchase",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{ orderid }}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+
+        window.location.href = "/orders/order_success/{{ order.id }}/";
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature)
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+</html>

@@ -1,0 +1,181 @@
+{% include 'navbar.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Online Grocery Shopping and Online Supermarket in India - bigbasket</title>
+  <link rel="shortcut icon"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3XfekLrDCd5cGYZHG0XelJNQ-hUCq2Jj6Vg&s"
+    type="image/x-icon">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="{% static 'css/carts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="{% static 'js/style.js' %}"></script>
+</head>
+<body>
+<div class="cart-shell">
+  <h1>Your Basket</h1>
+  <div class="cart-subtotal-bar">
+    <div>
+      <strong>Subtotal ({{ total_items }} item{{ total_items|pluralize }}) :</strong>
+      ₹ {{ subtotal|floatformat:2 }}
+    </div>
+
+    {% if cart_items %}
+      {% if out_of_stock %}
+        <button class="checkout-btn" disabled>Checkout Disabled (Out of Stock)</button>
+      {% else %}
+        <a href="{% url 'razorpaym:checkout' %}" class="checkout-btn">Checkout</a>
+      {% endif %}
+    {% else %}
+      <a href="{% url 'home' %}" class="checkout-btn">Add Items to cart</a>
+    {% endif %}
+
+    <div class="cart-savings">Savings: ₹ {{ savings|floatformat:2 }}</div>
+  </div>
+
+  <div class="cart-table-header">
+    <span class="cart-header-item">Items ({{ total_items }} item{{ total_items|pluralize }})</span>
+    <span class="cart-header-qty">Quantity</span>
+    <span class="cart-header-subtotal">Sub-total</span>
+    <span class="cart-header-actions">Actions</span>
+  </div>
+
+  {% for item in cart_items %}
+  <div class="cart-product-card {% if item.is_out_of_stock %}out-of-stock{% endif %}" data-cart-id="{{ item.id }}">
+    <!-- Product Image + Name + Price -->
+    <div class="cart-img-details">
+      <img src="{{ item.product.image }}" alt="{{ item.product.name }}" class="cart-img">
+      <div>
+        <div class="cart-product-name">{{ item.product.name }}</div>
+        <div class="cart-product-mrp">
+          ₹<span class="cart-product-price">{{ item.product.price|floatformat:2 }}</span>
+          {% if item.product.mrp and item.product.mrp > item.product.price %}
+            <span class="cart-product-mrp-del">₹{{ item.product.mrp|floatformat:0 }}</span>
+          {% endif %}
+        </div>
+
+        {% if item.saved %}
+          <div class="cart-saving-text">Saved: ₹{{ item.saved|floatformat:0 }}</div>
+        {% endif %}
+
+        {% if item.is_out_of_stock %}
+          <div class="text-danger fw-bold">⚠ Out of Stock</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quantity Controls -->
+    <div class="cart-qty-controls">
+      <button class="cart-qty-btn" onclick="updateCartQty({{ item.id }} , -1)">-</button>
+      <span class="cart-qty-number" id="cart-qty-{{ item.id }}">{{ item.quantity }}</span>
+      <button class="cart-qty-btn" 
+              onclick="updateCartQty({{ item.id }} , 1)"
+              {% if item.is_out_of_stock %}disabled{% endif %}>+</button>
+    </div>
+
+    <!-- Subtotal -->
+    <div class="cart-item-subtotal" id="cart-item-subtotal-{{ item.id }}">
+      ₹ {{ item.total_price|floatformat:2 }}
+    </div>
+
+    <!-- Actions -->
+    <div class="cart-item-actions">
+      <button class="cart-delete-btn" onclick="deleteCartItem({{ item.id }})">Delete</button> 
+    </div>
+  </div> 
+  {% empty %}
+    <div class="cart-empty">Your cart is empty.</div>
+  {% endfor %} 
+</div>
+
+
+<style>
+  .cart-table-header,
+  .cart-product-card {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr; /* Product | Quantity | Subtotal | Actions */
+    align-items: center;
+    gap: 1rem;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .cart-table-header {
+    font-weight: bold;
+  }
+
+  .cart-img-details {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .cart-product-card.out-of-stock {
+    opacity: 0.6;
+  }
+
+  .text-danger {
+    color: red;
+  }
+
+  .checkout-btn[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+</style>
+
+<script src="{% static 'js/style.js' %}"></script>
+<script>
+  // Show/hide mega-menu on button click
+  document.getElementById('openMegaMenu').addEventListener('click', function(e) {
+    document.getElementById('megaMenuDropdown').classList.toggle('active');
+  });
+
+  // Set up hover for categories and subcategories
+  const mainCats = document.querySelectorAll('.main-cat');
+  const subMenus = document.querySelectorAll('.level-two');
+  const subCats = document.querySelectorAll('.sub-cat');
+  const subSubMenus = document.querySelectorAll('.level-three');
+
+  mainCats.forEach(cat => {
+    cat.addEventListener('mouseenter', function() {
+      // Remove .active from all main and sub menus
+      mainCats.forEach(c => c.classList.remove('active'));
+      subMenus.forEach(s => s.classList.remove('active'));
+      subSubMenus.forEach(s => s.classList.remove('active'));
+      // Activate hovered main cat
+      cat.classList.add('active');
+      const submenu = document.getElementById('sub-' + cat.dataset.sub);
+      if (submenu) submenu.classList.add('active');
+    });
+  });
+
+  subCats.forEach(subcat => {
+    subcat.addEventListener('mouseenter', function(e) {
+      // Remove .active from all sub-sub-menus
+      subSubMenus.forEach(s => s.classList.remove('active'));
+      subCats.forEach(s => s.classList.remove('active'));
+      // Activate hovered sub-cat
+      subcat.classList.add('active');
+      const subsubmenu = document.getElementById('subsub-' + subcat.dataset.subsub);
+      if (subsubmenu) subsubmenu.classList.add('active');
+      e.stopPropagation();
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    // Hide menu if click outside
+    if (!document.querySelector('.mega-menu-container').contains(e.target)) {
+      document.getElementById('megaMenuDropdown').classList.remove('active');
+      subMenus.forEach(s => s.classList.remove('active'));
+      mainCats.forEach(c => c.classList.remove('active'));
+      subSubMenus.forEach(s => s.classList.remove('active'));
+      subCats.forEach(s => s.classList.remove('active'));
+    }
+  });
+</script>
+</body>
+</html>

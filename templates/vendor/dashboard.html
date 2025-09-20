@@ -1,0 +1,171 @@
+{% extends "vendor/base.html" %}
+{% block title %}Vendor Dashboard{% endblock %}{% load static %}
+
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Vendor Info -->
+    <!-- <div class="d-flex justify-content-center align-item-center col-md-3" style="border-radius: 10px;">
+        {% if vendor.shop_image %}
+        <img src="{{ vendor.shop_image }}" alt="{{ vendor.shop_name }}" class="img-fluid rounded"  >
+        {% else %}
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr3xOZrREto9WNjqxVOjZy4D7m7ByimftjKg&s" alt="Vendor" class="img-fluid rounded">
+        {% endif %}
+    </div> -->
+    <div class="col-md-9 d-flex flex-column justify-content-center">
+        <h2>{{ vendor.shop_name }}</h2>
+        <!-- <p><strong>Username:</strong> {{ vendor.user.user.username }}</p> -->
+        <!-- <p><strong>GST Number:</strong> {{ vendor.gst_number|default:"N/A" }}</p> -->
+        <p><strong>Phone:</strong> {{ vendor.phone_number|default:"N/A" }}</p>
+        <p><strong>Enail:</strong> {{ vendor.user.user.email|default:"N/A" }}</p>
+        
+    </div>
+    <div><br>   
+    <a href="{% url 'vendor_details_edit' %}" class="btn btn-warning">Edit Details</a>
+        </div>
+</div>
+
+<!-- Recent Orders Section -->
+ 
+
+<!-- Products Section -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Your Products</h5>
+    </div>
+    <div class="card-body">
+        {% if products %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category.name }}</td>
+                    <td>₹{{ product.price }}</td>
+
+                    {% if product.quantity is 0 %}
+                        <td>Out Of Stock</td>
+                    {% else %}
+                        <td>{{product.quantity}}</td>
+                    {% endif %}
+                    
+                    <td>
+                        {% if product.image %}
+                        <img src="{{ product.image }}" alt="{{ product.name }}" width="50">
+                        {% else %}
+                        No Image
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'vendor_edit_product' product.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'vendor_delete_product' product.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this product?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No products yet. <a href="{% url 'vendor_add_product' %}">Add one</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Categories Section -->
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Categories</h5>
+    </div>
+    <div class="card-body">
+        {% if categories %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>
+                        <a href="{% url 'vendor_edit_category' category.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'vendor_delete_category' category.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this category?')">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No categories yet. <a href="{% url 'vendor_add_category' %}">Add one</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- Recent Orders Section -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Recent Orders</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_orders %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Order Placed Date</th>
+                    <th>Payment Status / ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>₹{{ order.total_amount }}</td>
+                    <td>{{ order.placed_at|date:"d M Y" }}</td>
+                    <td>{{order.payment_status}} / {{order.razor_pay_id}}</td>
+                    <td>
+                        <form method="post" action="{% url 'vendor_update_order_status' order.id %}">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+                                {% for key,label in status_choices %}
+                                    <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </td>
+
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No recent orders yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
+.

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    {% load static %}
+  <link rel="stylesheet" href="{% static 'css/orders.css' %}">
+  <script src="{% static 'js/style.js' %}"></script>
+</head>
+<body>
+{% if orders %}
+<h2>My Orders</h2>
+<table class="orders-table">
+  <tr> 
+    <th>Date</th>
+    <th>Order ID</th>
+    <th>Slot</th>
+    <th>Total</th>
+    <th>Saved</th>
+    <th>Status</th>
+    <th>Items</th>
+  </tr>
+  {% for order in orders %}
+  <tr>
+    <td>{{ order.placed_at|date:"d M, H:i" }}</td>
+    <td style="width: 250px;">{{ order.razor_pay_id }}</td>
+    <td>₹{{ order.total_amount }}</td>
+    <td>₹{{ order.savings }}</td>
+    <td>₹{{ order.delivery_slot }}</td>
+    <td>
+      {{ order.status }}
+      {% if order.status == "Placed" %}
+        <span style="color:green; font-size:18px;">✔</span>
+      {% endif %}
+    </td>
+    <td>
+      {% for item in order.items.all %}
+        <img src="{{ item.image_url }}" height="24" title="{{ item.product }}" style="margin-right:6px;">
+      {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<h2>My Orders</h2>
+      <p>NO orders Yet</p>
+{% endif %}
+
+
+
+
+
+    
+</body>
+</html>

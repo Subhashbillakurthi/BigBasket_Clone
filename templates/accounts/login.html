@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <div class="modal-overlay" id="login-modal-overlay" >
+    <div class="login-modal">
+      <div class="modal-left">
+        <p class="why-title">Why choose Bigbasket?</p>
+        <div class="why-list">
+          <div class="why-row">
+            <img src="{% static 'images/loginicon-1.png' %}" alt="iconimg">
+            <div class="why-row-info">Quality</div>
+          </div>
+          <div class="why-row">
+            <img src="{% static 'images/loginicon-2.png' %}" alt="iconimg">
+            <div class="why-row-info">On time</div>
+          </div>
+          <div class="why-row">
+            <img src="{% static 'images/loginicon-3.png' %}" alt="iconimg">
+            <div class="why-row-info">Return Policy</div>
+          </div>
+          <div class="why-row">
+            <img src="{% static 'images/loginicon-4.png' %}" alt="iconimg">
+            <div class="why-row-info">Free delivery</div>
+          </div>
+        </div>
+        <hr class="ticker">
+        <div class="get-app">
+          <span class="find-us">Find us on</span>
+          <img src="{% static 'images/loginicon-5.png' %}" alt="Play" class="store-badge">
+        </div>
+      </div>
+      <div class="modal-right">
+        <a href="{% url 'home' %}" class="close-modal" id="close-modal">&times;</a>
+        <div class="login-title">Login</div>
+        <div class="otp-caption">Using Username & Password
+          <hr class="otp-hr">
+        </div>
+        <form method="post">
+        {% csrf_token %}
+        <input type="text" class="login-input" name="username" placeholder="Enter User Id">
+        <input type="password" class="login-input" name="password" placeholder="Password">
+        <button class="login-continue" type="submit">Continue</button>
+        </form>
+        <div>
+          {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">
+              {{ message }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        <div class="user-register">New User? <a href="{% url 'register' %}" class="register-link">Register</a></div>
+        <div class="user-register">Use OTP login! <a href="{% url 'send_otp' %}" class="register-link">OtpLogin</a></div>
+        <div class="login-info">
+          By continuing, I accept TCP -
+          <a href="#" class="tnc-link">bigbasket's Terms and Conditions & Privacy Policy</a><br>
+          This site is protected by reCAPTCHA and the Google
+          <a href="#" class="tnc-link">- Privacy Policy</a> &amp;
+          <a href="#" class="tnc-link">Terms of Service</a> apply.
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

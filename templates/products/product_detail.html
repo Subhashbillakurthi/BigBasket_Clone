@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Grocery Shopping and Online Supermarket in India - bigbasket</title>
+    <link rel="shortcut icon"
+        href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3XfekLrDCd5cGYZHG0XelJNQ-hUCq2Jj6Vg&s"
+        type="image/x-icon">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/products.css' %}">
+    <script src="{% static 'js/style.js' %}"></script>
+
+
+</head>
+
+<body>
+
+    <header class="header-bar">
+        <div class="logo-section">
+            <a href="{% url 'home' %}">
+      <img class="logo-img"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr3xOZrREto9WNjqxVOjZy4D7m7ByimftjKg&s"
+        alt="bigbasket logo"></a>
+        </div>
+
+        <div class="search-bar">
+            <span class="search-icon">
+                <svg height="20" width="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="9" cy="9" r="7" stroke="#99bb42" stroke-width="2" />
+                    <line x1="14.3" y1="14.3" x2="18" y2="18" stroke="#99bb42" stroke-width="2"
+                        stroke-linecap="round" />
+                </svg>
+            </span>
+            <input type="text" class="search-input" placeholder="Search for Products..." />
+        </div>
+
+
+        <div class="delivery-section">
+            <div class="delivery-info">
+                <div>
+                    <span class="delivery-icon">&#9889;</span>
+                    <span class="delivery-text">Delivery in <b>5 mins</b></span>
+                </div>
+                <span class="delivery-location">Select Location</span>
+
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+
+        <div style="position:relative;display:inline-block;">
+            <div class="cart-icon" onclick="toggleProfileDropdown()" style="cursor:pointer;">
+                <img src="{% static 'images/profileicon.png' %}" alt="profile-btn" id="profile-btn">
+            </div>
+            <div class="dropdown-menu" id="profileDropdown">
+                <a href="{% url 'profile_page' %}" class="dropdown-link">My Account</a>
+                <a href="#" class="dropdown-link">
+                    My Basket
+                    <span class="badge badge-red">0 item</span>
+                </a>
+                <a href="#" class="dropdown-link">My Orders</a>
+                <a href="{% url 'products:wishlist_and_cart' %}" class="dropdown-link">My Wishlist</a>
+                <a href="#" class="dropdown-link">
+                    My Wallet
+                    <span class="badge badge-green">₹0</span>
+                </a>
+                <a href="#" class="dropdown-link">Contact Us</a>
+                <a href="{% url 'logout' %}" class="dropdown-link logout-link">Logout</a>
+            </div>
+        </div>
+
+        {% else %}
+        <a href="{% url 'login' %}" class="login-btn">Login/ Sign Up</a>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+    <div class="cart-icon">
+      <a href="{% url 'cart:cart' %}">
+        <img src="{% static 'images/image.png' %}" alt="cart-icon">
+      </a>
+    </div>
+    {% else %}
+    <div class="cart-icon">
+      <a href="{% url 'login' %}">
+        <img src="{% static 'images/image.png' %}" alt="cart-icon">
+      </a>
+    </div>
+    {% endif %}
+
+    </header>
+
+    <div class="menu-bar">
+           <!-- Shop by Category -->
+<!-- Mega Menu HTML -->
+<div class="mega-menu-container">
+  <button class="category-btn" id="openMegaMenu">Shop by Category ▸</button>
+  <div class="mega-menu" id="megaMenuDropdown">
+    <ul class="level-one">
+      {% for category in categories %}
+        <li class="main-cat" data-sub="{{ category.id }}">{{ category.name }}</li>
+      {% endfor %}
+    </ul>
+    <div class="level-two-wrap">
+      {% for category in categories %}
+        <ul class="level-two sub-menu" id="sub-{{ category.id }}">
+          {% for subcat in category.subcategories.all %}
+            <li class="sub-cat" data-subsub="{{ subcat.id }}">{{ subcat.name }}</li>
+          {% endfor %}
+        </ul>
+      {% endfor %}
+    </div>
+    <div class="level-three-wrap">
+      {% for category in categories %}
+        {% for subcat in category.subcategories.all %}
+          <ul class="level-three sub-sub-menu" id="subsub-{{ subcat.id }}">
+            {% for subsubcat in subcat.subsubcategories.all %}
+              <li><a style="text-decoration: none;color: black;" href="{% url 'products:category_products' category_name=subsubcat.name|urlencode %}">{{ subsubcat.name }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+
+<!-- shopbycatend -->
+        <div class="menu-links-scroll">
+            {% for cat in categories1 %}
+            <a class="menu-link {% if category and cat.id == category.id %}highlighted{% endif %}"
+            href="{% url 'products:category_products' category_id=cat.id %}">
+            {{ cat.name }}
+            </a>
+            {% endfor %}
+            <svg width="36" height="16" style="vertical-align:middle;" viewBox="0 0 36 20"
+                xmlns="http://www.w3.org/2000/svg">
+                <polyline points="7,5 13,10 7,15" fill="none" stroke="#222" stroke-width="2" />
+                <polyline points="19,5 25,10 19,15" fill="none" stroke="#222" stroke-width="2" />
+            </svg>
+
+        </div>
+
+        <span class="divider"></span>
+
+        <span class="menu-btn smart-basket">
+            <svg width="22" height="22" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="#a2bb78" stroke-width="2" fill="none" />
+                <rect x="8" y="11" width="8" height="5" rx="1.5" fill="#e6f2c8" />
+                <rect x="7" y="7" width="10" height="7" rx="1" stroke="#a2bb78" stroke-width="1" fill="none" />
+            </svg>
+            <span class="smart-basket-label">Smart<br>basket</span>
+        </span>
+        <span class="menu-btn offers-btn">
+            <svg width="16" height="16" style="vertical-align: middle;" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="#7da918" />
+                <text x="12" y="17" text-anchor="middle" font-size="13" fill="#fff" font-family="Arial">&#9733;</text>
+            </svg>
+            <span>Offers</span>
+        </span>
+    </div>
+
+
+
+    <nav class="breadcrumb">
+        <a href="{% url 'home' %}" style="text-decoration: none;color: rgb(84, 79, 79);">Home</a> 
+        /  / {{ product.name }}
+    </nav>
+    <div class="container-breadcrumb">
+        <div class="product-page">
+            <div class="product-gallery">
+                <div class="thumbnails">
+
+                    <img src="{{ product.image }}" alt="{{ product.name }}"
+                        class="{% if forloop.first %}active{% endif %}" onclick="changeImage(this)">
+                    <img src="{{ product.image1 }}" alt="{{ product.name }}"
+                        class="{% if forloop.first %}active{% endif %}" onclick="changeImage(this)">
+                    <img src="{{ product.image2 }}" alt="{{ product.name }}"
+                        class="{% if forloop.first %}active{% endif %}" onclick="changeImage(this)">
+                    <img src="{{ product.image3 }}" alt="{{ product.name }}"
+                        class="{% if forloop.first %}active{% endif %}" onclick="changeImage(this)">
+                    <img src="{{ product.image2 }}" alt="{{ product.name }}"
+                        class="{% if forloop.first %}active{% endif %}" onclick="changeImage(this)">
+
+
+                </div>
+                {% if product.quantity is 0 %}
+                  <!-- <div class="main-image-container">
+                      <img id="mainImage" src="{{ product.image }}" alt="main product">
+                  </div>
+                  <div class="out-of-stock">Out Of Stock</div> -->
+                  <div class="main-image-container">
+                    <img id="mainImage" src="{{ product.image }}" alt="main product">
+                    <div class="out-of-stock-badge">Out Of Stock</div>
+                  </div>
+                {% else %}
+                  <div class="main-image-container">
+                      <img id="mainImage" src="{{ product.image }}" alt="main product">
+                  </div>
+                {% endif %}
+            </div>
+
+
+            <div class="product-details">
+                <h1 class="title">{{ product.name }}, <span id="main-weight">{{ product.weight }}</span></h1>
+                <p class="mrp">MRP: <span class="strike" id="main-mrp">₹{{ product.mrp }}</span></p>
+                <p class="price">Price: ₹<span id="main-price">{{ product.price }}</span>
+                    <span class="per" id="main-priceperg">(₹{{ product.price_per_g }} / g)</span>
+                </p>
+                <p class="discount">You Save: <span id="main-discount">{{ product.discount_percent }}% OFF</span></p>
+
+                <div class="action-row">
+            <button class="bookmark-btn" title="Add to Wishlist" data-product-id="{{ product.id }}">
+            <span class="material-icons" style="font-size: 18px">bookmark_outline</span>
+            </button>
+            {% if product.quantity is 0 %}
+            <button class="add-btn3" data-product-id="{{ product.id }}" disabled>Out of Stock</button>
+            {% else %}
+            <button class="add-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+            {% endif %}
+          </div>
+                <div class="delivery">🚚 Standard: Get it in 1 day</div>
+
+                {% for pack in packs %}
+                <div class="pack {% if forloop.first %}active{% endif %}" data-weight="{{ pack.weight }}"
+                    data-mrp="{{ pack.mrp }}" data-price="{{ pack.price }}" data-priceperg="{{ pack.price_per_g }}"
+                    data-discount="{{ pack.discount_percent }}">
+                    <span class="pack-qty">{{ pack.weight }}</span>
+                    <span class="pack-price">₹{{ pack.price }} (₹{{ pack.price_per_g }} / g)</span>
+                    <span class="pack-discount">{{ pack.discount_percent }}% OFF</span>
+                    {% if forloop.first %}<span class="pack-check">&#10003;</span>{% endif %}
+                </div>
+
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+    </div>
+    </div> 
+
+<hr>
+
+
+<div class="container" style="padding: 40px 190px;">
+  <h4>fresho! {{ product.title }}</h4>
+
+  <!-- Accordion -->
+  <div class="accordion" id="productAccordion">
+    <div class="accordion-item">
+      <button class="accordion-header" onclick="toggleAccordion(0)">
+        Description
+        <i class="fa-solid fa-chevron-down accordion-icon" id="icon-0"></i>
+      </button>
+      <div class="accordion-body">
+        <p>{{ product.description }}</p>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <button class="accordion-header" onclick="toggleAccordion(1)">
+        Specifications
+        <i class="fa-solid fa-chevron-down accordion-icon" id="icon-1"></i>
+      </button>
+      <div class="accordion-body">
+        <p>{{ product.specifications }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rating Box -->
+<div class="container" style="padding: 20px 190px; margin-bottom: 60px;">
+  <h4 class="mb-4">Rating and Reviews</h4>
+
+  <div class="text-center d-flex flex-column" 
+       style="border: 1px solid gray; padding: 50px 0px 50px 400px; border-radius: 8px; background: #fafafa;">
+    <i class="fa-solid fa-comment-dots mb-3" style="font-size: 50px;"></i>
+    <p class="mb-2" style="font-size: 16px; font-weight: 500;">Want to rate this product?</p>
+    <p style="color: #555; font-size: 14px;">
+      You can rate or review this product only after <br>
+      purchasing from BigBasket
+    </p>
+  </div>
+</div>
+
+<!-- More Info -->
+<!-- <div class="container" style="padding: 20px 190px; margin-bottom: 60px;">
+  <h4 style="font-size: 16px;" class="mb-4">More Information</h4>
+  <div>
+    <h5 style="font-size: 13px;">{{ product.category.parent }} / {{ product.category }}</h5>
+    <h6 style="font-size: 13px;">Brand</h6>
+    <p style="font-size: 13px;">{{ product.brand }}</p>
+  </div>
+</div> -->
+
+<!-- CSS -->
+<style>
+.accordion {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+.accordion-item {
+  border-bottom: 1px solid #ddd;
+}
+
+.accordion-header {
+  width: 100%;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border: none;
+  text-align: left;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.accordion-icon {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.accordion-body {
+  display: none;
+  padding: 15px 20px;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.accordion-body.open {
+  display: block;
+}
+</style>
+
+<!-- JS -->
+<script>
+function toggleAccordion(index) {
+  const bodies = document.querySelectorAll(".accordion-body");
+  const icons = document.querySelectorAll(".accordion-icon");
+
+  bodies.forEach((body, i) => {
+    const icon = icons[i];
+    if (i === index) {
+      const isOpen = body.classList.contains("open");
+      body.classList.toggle("open");
+      icon.classList.toggle("fa-chevron-down", !isOpen);
+      icon.classList.toggle("fa-chevron-up", isOpen);
+    } else {
+      body.classList.remove("open");
+      icons[i].classList.remove("fa-chevron-up");
+      icons[i].classList.add("fa-chevron-down");
+    }
+  });
+}
+</script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+
+<script src="{% static 'js/style.js' %}"></script>
+<script>
+  // Show/hide mega-menu on button click
+document.getElementById('openMegaMenu').addEventListener('click', function(e) {
+  document.getElementById('megaMenuDropdown').classList.toggle('active');
+});
+
+// Set up hover for categories and subcategories
+const mainCats = document.querySelectorAll('.main-cat');
+const subMenus = document.querySelectorAll('.level-two');
+const subCats = document.querySelectorAll('.sub-cat');
+const subSubMenus = document.querySelectorAll('.level-three');
+
+mainCats.forEach(cat => {
+  cat.addEventListener('mouseenter', function() {
+    // Remove .active from all main and sub menus
+    mainCats.forEach(c => c.classList.remove('active'));
+    subMenus.forEach(s => s.classList.remove('active'));
+    subSubMenus.forEach(s => s.classList.remove('active'));
+    // Activate hovered main cat
+    cat.classList.add('active');
+    const submenu = document.getElementById('sub-' + cat.dataset.sub);
+    if (submenu) submenu.classList.add('active');
+  });
+});
+
+subCats.forEach(subcat => {
+  subcat.addEventListener('mouseenter', function(e) {
+    // Remove .active from all sub-sub-menus
+    subSubMenus.forEach(s => s.classList.remove('active'));
+    subCats.forEach(s => s.classList.remove('active'));
+    // Activate hovered sub-cat
+    subcat.classList.add('active');
+    const subsubmenu = document.getElementById('subsub-' + subcat.dataset.subsub);
+    if (subsubmenu) subsubmenu.classList.add('active');
+    e.stopPropagation();
+  });
+});
+
+document.addEventListener('click', function(e) {
+  // Hide menu if click outside
+  if (!document.querySelector('.mega-menu-container').contains(e.target)) {
+    document.getElementById('megaMenuDropdown').classList.remove('active');
+    subMenus.forEach(s => s.classList.remove('active'));
+    mainCats.forEach(c => c.classList.remove('active'));
+    subSubMenus.forEach(s => s.classList.remove('active'));
+    subCats.forEach(s => s.classList.remove('active'));
+  }
+});
+
+</script>
+
+
+</html>

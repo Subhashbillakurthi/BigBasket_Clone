@@ -1,0 +1,141 @@
+{% extends "vendor/base.html" %}
+{% load static %}
+
+{% block title %}All Orders - Vendor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">All Orders Received</h2>
+
+    <!-- ✅ Messages -->
+    {% if messages %}
+    <div>
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="accordion" id="ordersAccordion">
+        {% for order in orders %}
+        <div class="accordion-item mb-3 shadow-sm rounded">
+            <h2 class="accordion-header" id="heading{{ order.id }}">
+                <button class="accordion-button collapsed d-flex justify-content-between align-items-center"
+                        type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse{{ order.id }}" aria-expanded="false"
+                        aria-controls="collapse{{ order.id }}">
+                    <span>
+                        <strong>Order #{{ order.id }}</strong> — ₹{{ order.total_amount|floatformat:2 }}
+                    </span>
+                    <span >
+                        
+                        {% if order.status == "Placed" %}
+                            <span class="badge bg-primary ms-2">{{ order.status }}</span>
+                        {% elif order.status == "In Process" %}
+                            <span class="badge bg-info text-dark ms-2">{{ order.status }}</span>
+                        {% elif order.status == "Packed" %}
+                            <span class="badge bg-warning text-dark ms-2">{{ order.status }}</span>
+                        {% elif order.status == "On The Way" %}
+                            <span class="badge bg-success ms-2">{{ order.status }}</span>
+                        {% elif order.status == "Reached" %}
+                            <span class="badge bg-dark ms-2">{{ order.status }}</span>
+                        {% elif order.status == "Delivered" %}
+                            <span class="badge bg-success ms-2">{{ order.status }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary ms-2">{{ order.status }}</span>
+                        {% endif %}
+
+
+
+
+                    </span>
+                </button>
+            </h2>
+            <div id="collapse{{ order.id }}" class="accordion-collapse collapse"
+                 aria-labelledby="heading{{ order.id }}" data-bs-parent="#ordersAccordion">
+                <div class="accordion-body">
+
+                    <!-- Customer Info -->
+                    <p><strong>Customer:</strong>
+                       {% if order.address and order.address.customer_name %}
+                           {{ order.address.customer_name }}
+                       {% else %}
+                           {{ order.user.get_full_name|default:order.user.username }}
+                       {% endif %}
+                    </p>
+                    <p><strong>Email:</strong> {{ order.user.email }}</p>
+                    <p><strong>Phone:</strong>
+                       {% if order.address and order.address.customer_phone %}
+                           {{ order.address.customer_phone }}
+                       {% else %}
+                           N/A
+                       {% endif %}
+                    </p>
+
+                    <!-- Shipping Address -->
+                    <p><strong>Shipping Address:</strong><br>
+                        {% if order.address %}
+                            {{ order.address.customer_name }}<br>
+                            {{ order.address.address_line }},
+                            {{ order.address.city }} - {{ order.address.pincode }}<br>
+                            {{ order.address.state }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+
+                    <!-- Ordered Products -->
+                    <hr>
+                    <h5>Ordered Products</h5>
+                    <ul class="list-group mb-3">
+                        {% for item in order.items.all %}
+                            {% if item.product.vendor == vendor %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ item.product.name }}</strong><br>
+                                    Qty: {{ item.quantity }} • ₹{{ item.price|default:item.mrp }}
+                                </div>
+                                <span class="badge bg-light text-dark">Vendor Item</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+
+                    <!-- Status Update -->
+                    <div class="mb-3">
+                        <form method="post" action="{% url 'vendor_all_orders' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <label class="form-label"><strong>Update Order Status:</strong></label>
+                            <select class="form-select form-select-sm" name="new_status" onchange="this.form.submit()">
+                                {% for key,label in status_choices %}
+                                <option value="{{ key }}" {% if order.status == key %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+
+                    <!-- Extra Info -->
+                    <p><strong>Total Amount:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+                    <p><strong>Reference No:</strong> {{ order.razor_pay_id }}</p>
+
+                    <p><strong>Ordered At:</strong> {{ order.placed_at|date:"d M Y, H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No orders found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.accordion-button { background-color: #f8f9fa; }
+.accordion-button:focus { box-shadow: none; }
+.badge { font-size: 0.8rem; }
+</style>
+{% endblock %}
