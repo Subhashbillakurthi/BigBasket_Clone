@@ -21,7 +21,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Build Docker image
+      - name: Build Docker image
         run: |
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/bigbasket_clone/myapp:latest
           docker build -t $IMAGE_NAME .
@@ -42,4 +42,3 @@ jobs:
       #       docker stop myapp || true
       #       docker rm myapp || true
       #       docker run -d -p 8000:8000 --name myapp ${{ env.IMAGE_NAME }}
-
