@@ -1,0 +1,42 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/myapp:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}/myapp:latest
+
+      # - name: Deploy to AWS EC2
+      #   uses: appleboy/ssh-action@v0.1.10
+      #   with:
+      #     host: ${{ secrets.EC2_HOST }}
+      #     username: ubuntu
+      #     key: ${{ secrets.EC2_SSH_KEY }}
+      #     script: |
+      #       docker pull ghcr.io/${{ github.repository }}/myapp:latest
+      #       docker stop myapp || true
+      #       docker rm myapp || true
+      #       docker run -d -p 8000:8000 --name myapp ghcr.io/${{ github.repository }}/myapp:latest
