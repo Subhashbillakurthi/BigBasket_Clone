@@ -21,13 +21,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
+            - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/myapp:latest .
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/bigbasket_clone/myapp:latest
+          docker build -t $IMAGE_NAME .
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}/myapp:latest
+          docker push ${{ env.IMAGE_NAME }}
 
       # - name: Deploy to AWS EC2
       #   uses: appleboy/ssh-action@v0.1.10
@@ -36,7 +38,8 @@ jobs:
       #     username: ubuntu
       #     key: ${{ secrets.EC2_SSH_KEY }}
       #     script: |
-      #       docker pull ghcr.io/${{ github.repository }}/myapp:latest
+      #       docker pull ${{ env.IMAGE_NAME }}
       #       docker stop myapp || true
       #       docker rm myapp || true
-      #       docker run -d -p 8000:8000 --name myapp ghcr.io/${{ github.repository }}/myapp:latest
+      #       docker run -d -p 8000:8000 --name myapp ${{ env.IMAGE_NAME }}
+
