@@ -39,14 +39,16 @@ jobs:
         run: |
           docker push ${{ env.IMAGE_NAME }}
 
-      - name: Deploy to AWS EC2
+      - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: 13.220.61.106
+          host: 54.80.151.113
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull ${{ env.IMAGE_NAME }}
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u subhashbillakurthi --password-stdin
+            docker pull ghcr.io/subhashbillakurthi/bigbasket_clone/myapp:latest
             docker stop myapp || true
             docker rm myapp || true
-            docker run -d -p 8000:8000 --name myapp ${{ env.IMAGE_NAME }}
+            docker run -d -p 8000:8000 --name myapp ghcr.io/subhashbillakurthi/bigbasket_clone/myapp:latest
+
