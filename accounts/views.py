@@ -182,6 +182,7 @@ def send_otp(request):
         else:
             # just log to console
             logger.info(f"📱 OTP for {identifier}: {otp}")
+            print(f"📱 OTP for {identifier}: {otp}", flush=True)
             messages.success(request, f"OTP sent to phone number (check terminal).")
 
         # store session
