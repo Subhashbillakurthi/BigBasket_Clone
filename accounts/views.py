@@ -122,6 +122,8 @@ def profile(request, username):
     
 import secrets
 import re
+import logging
+logger = logging.getLogger(__name__)
 
 def send_otp(request):
     LOCK_TIME = 5 * 60
@@ -178,8 +180,8 @@ def send_otp(request):
             )
             messages.success(request, "OTP sent successfully! Please check your email.")
         else:
-            # just print to console
-            print(f"📱 OTP for {identifier}: {otp}")
+            # just log to console
+            logger.info(f"📱 OTP for {identifier}: {otp}")
             messages.success(request, f"OTP sent to phone number (check terminal).")
 
         # store session
