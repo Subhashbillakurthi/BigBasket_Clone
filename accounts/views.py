@@ -121,30 +121,42 @@ def profile(request, username):
         return redirect("register")
     
 import secrets
+import re
 
 def send_otp(request):
     LOCK_TIME = 5 * 60
     MAX_ATTEMPTS = 3
 
     if request.method == "POST":
-        email = request.POST.get("email")
+        identifier = request.POST.get("email")  # email or phone
+
+        # check if it's email
+        is_email = re.match(r"[^@]+@[^@]+\.[^@]+", identifier)
+        is_phone = re.match(r"^\d{10}$", identifier)
+
+        if not (is_email or is_phone):
+            messages.error(request, "Please enter a valid email or 10-digit phone number.")
+            return render(request, "accounts/otp.html")
+
+        # ✅ get or create user
         try:
-            user = User.objects.get(email=email)
+            if is_email:
+                user = User.objects.get(email=identifier)
+            else:
+                user = User.objects.get(username=identifier)
         except User.DoesNotExist:
-            # ✅ Create new user if email not found
             user = User.objects.create_user(
-                username=email,
-                email=email,
+                username=identifier,
+                email=identifier if is_email else "",
                 password=secrets.token_urlsafe(12),  # random safe password
             )
-            user.set_unusable_password()  # make sure normal login is disabled
+            user.set_unusable_password()
             user.save()
 
-            # Also create profile for this user
             if not hasattr(user, "profile"):
                 Profile.objects.create(user=user)
 
-        # 🔒 Check if user is locked from normal login
+        # 🔒 lock check
         key_lock = f"login_locked_{user.username}"
         now = timezone.now().timestamp()
         locked_until = cache.get(key_lock)
@@ -153,21 +165,29 @@ def send_otp(request):
             return render(request, "accounts/otp.html")
 
         # ✅ Generate OTP
-        otp = str(random.randint(100000, 999999))  
+        otp = str(random.randint(100000, 999999))
         EmailOTP.objects.update_or_create(user=user, defaults={"otp": otp})
 
-        send_mail(
-            "Your OTP Code",
-            f"Your OTP is {otp}. It will expire in 5 minutes.",
-            "yourgmail@gmail.com",
-            [email],
-        )
+        if is_email:
+            # send email
+            send_mail(
+                "Your OTP Code",
+                f"Your OTP is {otp}. It will expire in 5 minutes.",
+                "yourgmail@gmail.com",
+                [identifier],
+            )
+            messages.success(request, "OTP sent successfully! Please check your email.")
+        else:
+            # just print to console
+            print(f"📱 OTP for {identifier}: {otp}")
+            messages.success(request, f"OTP sent to phone number (check terminal).")
 
+        # store session
         request.session["otp_user_id"] = user.id
-        messages.success(request, "OTP sent successfully! Please check your email.")
         return redirect("verify_otp")
 
     return render(request, "accounts/otp.html")
+
 
 
 

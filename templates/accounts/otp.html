@@ -37,7 +37,7 @@
         </div>
         <form method="post">
         {% csrf_token %}
-        <input type="email" class="login-input" name="email" placeholder="Enter email" required>
+        <input type="text" class="login-input" name="email" placeholder="Enter email or phn number" required>
         <button class="login-continue" type="submit">Continue</button>
         <div class="user-register">Use ID login! <a href="{% url 'login' %}" class="register-link">IDLogin</a></div>
         </form>
